@@ -2,9 +2,10 @@ import React from 'react'
 import { useSnapshot } from 'valtio'
 import { useFrame } from '@react-three/fiber'
 import { Decal, useGLTF, useTexture } from '@react-three/drei'
+import { easing } from 'maath'
+import * as THREE from 'three'
 
 import state from '../store'
-import { easing } from 'maath'
 
 const Shirt = () => {
   const snap = useSnapshot(state)
@@ -14,7 +15,8 @@ const Shirt = () => {
   const fullTexture = useTexture(snap.fullDecal)
 
   useFrame((state, delta) => {
-    easing.damp(materials.lambert1.color, snap.color, 0.25, delta)
+    const targetColor = new THREE.Color(snap.color)
+    easing.dampC(materials.lambert1.color, targetColor, 0.25, delta)
   })
 
   const stateString = JSON.stringify(snap)
