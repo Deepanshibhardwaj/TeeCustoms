@@ -6,8 +6,8 @@ const state=proxy({
     color:'#EFBD48',
     isLogoTexture:true,
     isFullTexture:false,
-    logoDecal:'./threejs.png',
-    fullDecal:'./threejs.png',
+    logoDecal:'./nike.png',
+    fullDecal:'./nike.png',
 
 });
 export default state;
