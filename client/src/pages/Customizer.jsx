@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSnapshot } from 'valtio';
 
@@ -6,64 +6,98 @@ import config from '../config/config';
 import state from '../store';
 import { download, logoShirt, stylishShirt } from '../assets';
 import { downloadCanvasToImage, reader } from '../config/helpers';
-import { EditorTabs, FilterTabs, DecalTypes, DecalTypes } from '../config/constants';
+import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants';
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components';
-import { useScroll } from '@react-three/drei';
+
 const Customizer = () => {
   const snap = useSnapshot(state);
 
   const [file, setFile] = useState('');
-
-  const [prompy, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState('');
   const [generatingImg, setGeneratingImg] = useState(false);
 
   const [activeEditorTab, setActiveEditorTab] = useState("");
   const [activeFilterTab, setActiveFilterTab] = useState({
     logoShirt: true,
     stylishShirt: false,
+  });
 
-  })
-
-
-
-
-  //show tab content depending on the activetab
+  // Show tab content depending on the active tab
   const generateTabContent = () => {
     switch (activeEditorTab) {
       case "colorpicker":
-        return <ColorPicker />
+        return <ColorPicker />;
       case "filepicker":
         return <FilePicker
-        file ={file}
-        setFile={setFile}
-
-         />
+          file={file}
+          setFile={setFile}
+          readFile={readFile} // Pass readFile to FilePicker
+        />;
       case "aipicker":
-        return <AIPicker />
-
-        default:
-          return null;
+        return <AIPicker
+          prompt={prompt}
+          setPrompt={setPrompt}
+          generatingImg={generatingImg}
+          handleSubmit={handleSubmit}
+        />;
+      default:
+        return null;
     }
+  };
 
-  }
+  const handleSubmit = async (type) => {
+    if (!prompt) return alert("Please enter a prompt");
 
-  const handleDecals=(type, result){
-    const decalType= DecalTypes [type];
+    setGeneratingImg(true);
+
+    try {
+      // Assume generateImage is a function that generates an image based on the prompt
+      const result = await generateImage(prompt); // Implement generateImage as per your backend API
+      handleDecals(type, result);
+    } catch (error) {
+      alert(error);
+    } finally {
+      setGeneratingImg(false);
+      setActiveEditorTab("");
+    }
+  };
+
+  const handleDecals = (type, result) => {
+    const decalType = DecalTypes[type];
 
     state[decalType.stateProperty] = result;
-    if(!activeFilterTab[decalType.filterTab])
-  }
+    if (!activeFilterTab[decalType.filterTab]) {
+      handleActiveFilterTab(decalType.filterTab);
+    }
+  };
 
-  const readFile =(type)=>{
+  const handleActiveFilterTab = (tabName) => {
+    switch (tabName) {
+      case "logoShirt":
+        state.isLogoTexture = !activeFilterTab[tabName];
+        break;
+      case "stylishShirt":
+        state.isFullTexture = !activeFilterTab[tabName];
+        break;
+      default:
+        state.isLogoTexture = true;
+        state.isFullTexture = false;
+    }
+
+    setActiveFilterTab((prev) => ({
+      ...prev,
+      [tabName]: !prev[tabName],
+    }));
+  };
+
+  const readFile = (type) => {
     reader(file)
-    .then ((result) =>{
-      handleDecals(type, result);
-      setActiveEditorTab("");
-
-    })
-
-  }
+      .then((result) => {
+        handleDecals(type, result);
+        setActiveEditorTab("");
+      });
+  };
 
   return (
     <AnimatePresence>
@@ -71,7 +105,7 @@ const Customizer = () => {
         <>
           <motion.div
             key="custom"
-            className=' absolute top-0 left-0 z-10'
+            className='absolute top-0 left-0 z-10'
             {...slideAnimation('left')}
           >
             <div className='flex items-center min-h-screen'>
@@ -81,7 +115,6 @@ const Customizer = () => {
                     key={tab.name}
                     tab={tab}
                     handleClick={() => setActiveEditorTab(tab.name)}
-
                   />
                 ))}
                 {generateTabContent()}
@@ -100,25 +133,23 @@ const Customizer = () => {
             />
           </motion.div>
           <motion.div
-            className='filtertabs-container '
+            className='filtertabs-container'
             {...slideAnimation('up')}
           >
-            {FilterTabs
-              .map((tab) => (
-                <Tab
-                  key={tab.name}
-                  tab={tab}
-                  isFilterTab
-                  isActiveTab=" "
-                  handleClick={() => { }}
-                />
-              ))}
+            {FilterTabs.map((tab) => (
+              <Tab
+                key={tab.name}
+                tab={tab}
+                isFilterTab
+                isActiveTab={activeFilterTab[tab.name]} // Correctly set active tab
+                handleClick={() => handleActiveFilterTab(tab.name)} // Toggle filter tab
+              />
+            ))}
           </motion.div>
         </>
       )}
-
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default Customizer
+export default Customizer;
