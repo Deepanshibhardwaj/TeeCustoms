@@ -52,21 +52,16 @@ const Customizer = () => {
     setGeneratingImg(true);
 
     try {
-      setGeneratingImg(true);
-
-      const response= await fetch('http://localhost:8080/api/v1/dalle',{
+      const response = await fetch('http://localhost:8080/api/v1/dalle', {
         method: 'POST',
-        headers:{
+        headers: {
           'Content-Type': 'application/json'
         },
-        body :JSON.stringify({
-          prompt,
-        })
-      })
+        body: JSON.stringify({ prompt })
+      });
 
       const data = await response.json();
-      handleDecals(type, `data:image/png;base64, ${data.photo}`)
-
+      handleDecals(type, `data:image/png;base64,${data.photo}`);
     } catch (error) {
       alert(error);
     } finally {
@@ -95,6 +90,7 @@ const Customizer = () => {
       default:
         state.isLogoTexture = true;
         state.isFullTexture = false;
+        break;
     }
 
     setActiveFilterTab((prev) => ({
