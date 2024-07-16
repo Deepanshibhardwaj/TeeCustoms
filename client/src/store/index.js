@@ -3,11 +3,11 @@ import {proxy} from'valtio';
 
 const state=proxy({
     intro:true,
-    color:'#EFBD48',
+    color:'#000000',
     isLogoTexture:true,
     isFullTexture:false,
-    logoDecal:'./nike.png',
-    fullDecal:'./nike.png',
+    logoDecal:'./logo.png.jpg',
+    fullDecal:'./logo.png.jpg',
 
 });
 export default state;
