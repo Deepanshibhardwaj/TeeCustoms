@@ -1,3 +1,7 @@
+An AI-powered custom t-shirt design application, enabling users to create personalized designs through an intuitive interface and 
+real-time previews.
+
+
 ![Screenshot 2024-08-02 015803](https://github.com/user-attachments/assets/84f4a42d-147d-46f7-90c8-e582395013d4)
 
 
